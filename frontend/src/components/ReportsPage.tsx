@@ -7,12 +7,23 @@ interface Summary {
   category: string | null;
   summary: string;
   created_at?: string;
+  sources?: Array<{
+    id: number;
+    category: string;
+    summary: string;
+    group_name: string;
+    sender_name: string;
+    created_at: string;
+    source_type?: string;
+    source_name?: string;
+  }>;
 }
 
 export default function ReportsPage() {
   const [summaries, setSummaries] = useState<Summary[]>([]);
   const [generating, setGenerating] = useState(false);
   const [selected, setSelected] = useState<Summary | null>(null);
+  const [error, setError] = useState('');
 
   const fetchSummaries = useCallback(async () => {
     try {
@@ -21,22 +32,30 @@ export default function ReportsPage() {
       if (Array.isArray(data)) {
         setSummaries(data);
       }
-    } catch {}
+    } catch { /* Keep existing history when the local API is unavailable. */ }
   }, []);
 
-  useEffect(() => { fetchSummaries(); }, [fetchSummaries]);
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- initial remote data synchronization
+    fetchSummaries();
+  }, [fetchSummaries]);
 
   const generateSummary = async () => {
     setGenerating(true);
+    setError('');
     try {
-      const res = await fetch('/api/weekly_summary');
+      const res = await fetch('/api/weekly_summary?refresh=true');
       const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || '周报生成失败');
       if (data && data.week_start) {
         setSelected(data);
         fetchSummaries();
       }
-    } catch {}
-    setGenerating(false);
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : '周报生成失败');
+    } finally {
+      setGenerating(false);
+    }
   };
 
   return (
@@ -44,7 +63,7 @@ export default function ReportsPage() {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>AI 周报</h1>
-          <p className="text-sm mt-1" style={{ color: 'var(--text-secondary)' }}>AI 自动生成的每周情报摘要</p>
+          <p className="text-sm mt-1" style={{ color: 'var(--text-secondary)' }}>带原消息引用的每周重点摘要</p>
         </div>
         <button onClick={generateSummary} disabled={generating}
           className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-all hover:brightness-110 disabled:opacity-50"
@@ -53,6 +72,12 @@ export default function ReportsPage() {
           {generating ? '生成中...' : '生成本周周报'}
         </button>
       </div>
+
+      {error && (
+        <div className="mb-5 px-4 py-3 rounded-xl text-sm" style={{ background: 'rgba(255,80,80,0.08)', border: '1px solid rgba(255,80,80,0.2)', color: '#ff7b7b' }}>
+          {error}。原有周报未被覆盖。
+        </div>
+      )}
 
       <div className="flex gap-6">
         {/* 左侧列表 */}
@@ -110,6 +135,22 @@ export default function ReportsPage() {
                     {selected.summary}
                   </div>
                 </div>
+                {selected.sources && selected.sources.length > 0 && (
+                  <div className="mt-7 pt-5" style={{ borderTop: '1px solid var(--border)' }}>
+                    <h3 className="text-sm font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>引用依据</h3>
+                    <div className="space-y-2">
+                      {selected.sources.map(source => (
+                        <div key={source.id} className="rounded-lg px-4 py-3" style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid var(--border)' }}>
+                          <div className="flex items-center gap-2 text-xs font-mono mb-1" style={{ color: 'var(--neon-cyan)' }}>
+                            <span>[M{source.id}]</span>
+                            <span style={{ color: 'var(--text-dim)' }}>{source.source_name || source.source_type || '本地消息'} · {source.group_name || '未知群聊'} · {source.created_at}</span>
+                          </div>
+                          <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>{source.summary}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             ) : (
               <div className="px-6 py-24 text-center">

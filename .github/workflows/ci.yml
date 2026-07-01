@@ -33,16 +33,15 @@ jobs:
 
       - name: Build frontend
         working-directory: frontend
-        run: npm run build
+        run: |
+          npm run lint
+          npm run build
 
       - name: Install backend dependencies
         run: pip install -r backend/requirements.txt
 
-      - name: Check API syntax
-        run: python -c "import py_compile; py_compile.compile('backend/api.py', doraise=True)"
+      - name: Backend regression tests
+        run: python -m unittest discover -s tests -v
 
-      - name: Check Scraper syntax
-        run: python -c "import py_compile; py_compile.compile('backend/scraper.py', doraise=True)"
-
-      - name: Check Vercel API syntax
-        run: python -c "import py_compile; py_compile.compile('api/index.py', doraise=True)"
+      - name: Check Python syntax
+        run: python -m py_compile backend/api.py backend/scraper.py mothership/app.py mothership/bootstrap.py launcher.py build_exe.py

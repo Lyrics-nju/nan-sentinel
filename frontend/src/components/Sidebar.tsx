@@ -1,6 +1,6 @@
 import { NavLink } from 'react-router-dom';
 import {
-  LayoutDashboard, MessageSquare, Star, FileText, Settings, Zap, Search,
+  LayoutDashboard, MessageSquare, Star, FileText, Settings, Zap, Search, RadioTower,
 } from 'lucide-react';
 import UserAvatar from './UserAvatar';
 import NotificationBell from './NotificationBell';
@@ -10,41 +10,42 @@ const navItems = [
   { to: '/messages', icon: MessageSquare, label: '消息中心' },
   { to: '/bookmarks', icon: Star, label: '我的收藏' },
   { to: '/reports', icon: FileText, label: '周报' },
+  { to: '/mothership', icon: RadioTower, label: '情报母舰' },
   { to: '/settings', icon: Settings, label: '设置' },
 ];
 
 export default function Sidebar({ onSearch }: { onSearch?: () => void }) {
   return (
-    <div className="sidebar-nav w-[240px] flex flex-col shrink-0 overflow-hidden"
+    <aside className="sidebar-nav flex flex-col shrink-0 overflow-hidden"
          style={{ background: 'rgba(5,5,9,0.95)', borderRight: '1px solid var(--border)', height: '100%' }}>
       {/* Logo */}
-      <div className="px-5 py-5 flex items-center gap-3">
+      <div className="sidebar-brand px-5 py-5 flex items-center gap-3">
         <div className="w-10 h-10 rounded-xl flex items-center justify-center"
              style={{ background: 'rgba(0, 242, 255, 0.12)', border: '1px solid rgba(0, 242, 255, 0.25)' }}>
           <Zap size={20} style={{ color: 'var(--neon-cyan)' }} />
         </div>
-        <div>
+        <div className="sidebar-logo-copy">
           <h1 className="text-base font-bold tracking-tight" style={{ color: 'var(--text-primary)' }}>
-            AI 情报控制台
+            Nan Sentinel 南哨
           </h1>
-          <p className="text-[11px] font-mono" style={{ color: 'var(--text-dim)' }}>v0.3.0</p>
+          <p className="text-[11px] font-mono" style={{ color: 'var(--text-dim)' }}>v0.4.0 · 哨站</p>
         </div>
       </div>
 
       {/* 搜索 + 通知 */}
-      <div className="px-3 pb-2 flex items-center gap-1">
+      <div className="sidebar-tools px-3 pb-2 flex items-center gap-1">
         <button onClick={onSearch}
           className="flex-1 flex items-center gap-2 px-3 py-2 rounded-xl text-sm transition-colors hover:bg-white/[0.04]"
           style={{ color: 'var(--text-dim)', border: '1px solid var(--border)' }}>
           <Search size={14} />
-          <span className="flex-1 text-left text-xs">搜索</span>
-          <kbd className="text-[10px] px-1.5 py-0.5 rounded font-mono" style={{ background: 'rgba(255,255,255,0.06)' }}>⌘K</kbd>
+          <span className="sidebar-search-copy flex-1 text-left text-xs">搜索</span>
+          <kbd className="sidebar-search-copy text-[10px] px-1.5 py-0.5 rounded font-mono" style={{ background: 'rgba(255,255,255,0.06)' }}>⌘K</kbd>
         </button>
         <NotificationBell />
       </div>
 
       {/* 导航 */}
-      <nav className="flex-1 px-3 py-2 space-y-1">
+      <nav className="sidebar-links flex-1 px-3 py-2 space-y-1">
         {navItems.map(item => {
           const Icon = item.icon;
           return (
@@ -64,16 +65,16 @@ export default function Sidebar({ onSearch }: { onSearch?: () => void }) {
               })}
             >
               <Icon size={20} />
-              <span>{item.label}</span>
+              <span className="sidebar-label">{item.label}</span>
             </NavLink>
           );
         })}
       </nav>
 
       {/* 底部用户区 */}
-      <div className="px-4 py-4" style={{ borderTop: '1px solid var(--border)' }}>
+      <div className="sidebar-user px-4 py-4" style={{ borderTop: '1px solid var(--border)' }}>
         <UserAvatar />
       </div>
-    </div>
+    </aside>
   );
 }

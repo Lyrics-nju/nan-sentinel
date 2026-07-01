@@ -1,9 +1,9 @@
-; AI 社群情报控制台 — Inno Setup 安装脚本
+; Nan Sentinel（南哨）— Inno Setup 安装脚本
 ; 用 Inno Setup 6 打开此文件，点击 Compile 即可生成安装程序
 
-#define MyAppName "AI 社群情报控制台"
+#define MyAppName "Nan Sentinel（南哨）"
 #define MyAppVersion "0.4.0"
-#define MyAppPublisher "NanMarket"
+#define MyAppPublisher "Lyrics-nju"
 #define MyAppExeName "AI_Console_Launcher.exe"
 
 [Setup]

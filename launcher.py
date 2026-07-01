@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-AI 社群情报控制台 — 桌面客户端
+AI 学生消息助手 — 桌面客户端
 pywebview 原生窗口 + 内嵌 React 前端，无浏览器依赖。
 """
 import os
@@ -119,12 +119,12 @@ def start_api():
         else:
             py = BASE_DIR / "python" / "python.exe"
             p = subprocess.Popen(
-                [str(py), "-m", "uvicorn", "api:app", "--host", "0.0.0.0", "--port", str(API_PORT)],
+                [str(py), "-m", "uvicorn", "api:app", "--host", "127.0.0.1", "--port", str(API_PORT)],
                 cwd=str(DATA_DIR), env=env, **hide
             )
     else:
         p = subprocess.Popen(
-            [sys.executable, "-m", "uvicorn", "api:app", "--host", "0.0.0.0", "--port", str(API_PORT)],
+            [sys.executable, "-m", "uvicorn", "api:app", "--host", "127.0.0.1", "--port", str(API_PORT)],
             cwd=str(BACKEND_DIR), env=env, **hide
         )
 
@@ -193,7 +193,7 @@ def main():
     # 4. 打开 pywebview 原生窗口
     try:
         window = webview.create_window(
-            title="AI 社群情报控制台",
+            title="AI 学生消息助手",
             url=API_BASE,
             width=1200,
             height=800,

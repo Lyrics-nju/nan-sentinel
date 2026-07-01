@@ -39,7 +39,7 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6"
+    <div className="h-screen overflow-y-auto flex items-start justify-center p-6 py-8"
          style={{ background: 'linear-gradient(180deg, #000000 0%, #050509 100%)' }}>
       {/* 背景光晕 */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
@@ -56,7 +56,7 @@ export default function RegisterPage() {
               <Zap size={18} style={{ color: 'var(--neon-cyan)' }} />
             </div>
             <h1 className="text-2xl font-bold tracking-tight" style={{ color: 'var(--text-primary)' }}>
-              AI 社群情报控制台
+              AI 学生消息助手
             </h1>
           </div>
           <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
@@ -67,10 +67,11 @@ export default function RegisterPage() {
         {/* 注册卡片 */}
         <div className="glass rounded-2xl p-7">
           <div className="mb-6">
-            <label className="block text-xs font-medium mb-1.5" style={{ color: 'var(--text-secondary)' }}>
+            <label htmlFor="local-nickname" className="block text-xs font-medium mb-1.5" style={{ color: 'var(--text-secondary)' }}>
               你的昵称
             </label>
             <input
+              id="local-nickname"
               type="text"
               value={nickname}
               onChange={e => { setNickname(e.target.value); setError(''); }}
@@ -115,7 +116,7 @@ export default function RegisterPage() {
           <div className="mt-4 px-3 py-2.5 rounded-lg text-xs flex items-start gap-2"
                style={{ background: 'rgba(0, 242, 255, 0.04)', border: '1px solid rgba(0, 242, 255, 0.08)', color: 'var(--text-secondary)' }}>
             <AlertCircle size={13} className="mt-0.5 shrink-0" style={{ color: 'var(--neon-cyan)' }} />
-            <span>昵称仅用于区分你的消息数据，不会上传到任何地方。每个人只能看到自己的数据。</span>
+            <span>昵称仅保存在这台电脑，用于界面显示；不会上传，也不会作为云端账号或数据隔离依据。</span>
           </div>
         </div>
       </div>

@@ -1,27 +1,38 @@
-# AI 社群情报控制台 — 配置模板
-# 复制此文件为 config.yaml 并填写你的配置
+# AI 学生消息助手 — 本地配置模板
+# 复制为 config.yaml；也可直接在应用设置中填写。
 
-admin_key: ''  # 构建时自动生成，或手动填写
-
-feishu_sync:
-  enable: false
-  node_name: 默认节点
-  webhook_url: ''
+profile:
+  nickname: ''
 
 llm:
   api_key: ''
   base_url: https://api.deepseek.com
-  model: deepseek-v4-pro
-
-mothership:
-  url: ''
-  node_name: ''
+  model: deepseek-chat
 
 napcat:
   group_ids: []
+  include_private: false
+  login_platform: iPad
   webui_token: ''
   webui_url: http://127.0.0.1:6099
   ws_url: ws://127.0.0.1:3001
+
+mothership:
+  enabled: false
+  url: http://127.0.0.1:8010
+  node_name: ''
+  node_token: ''
+  admin_token: ''
+  share_evidence: false
+  share_calibration_stats: false
+  space_id: ''
+  space_name: ''
+  owner_label: ''
+  membership_status: ''
+  categories:
+    - A
+  source_refs: []
+  expires_at: ''
 
 scraper:
   mode: realtime

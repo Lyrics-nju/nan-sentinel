@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-AI 社群情报控制台 — EXE 打包脚本
+AI 学生消息助手 — EXE 打包脚本
 使用 PyInstaller 将核心组件打包为 Windows 可执行文件。
 """
 import os
@@ -128,7 +128,7 @@ import api
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(api.app, host="0.0.0.0", port=8000, log_level="info")
+    uvicorn.run(api.app, host="127.0.0.1", port=8000, log_level="info")
 ''', encoding="utf-8")
 
     # 使用 --paths 让 PyInstaller 能找到 backend 下的模块
@@ -276,45 +276,50 @@ def create_exe_package(launcher_exe, api_exe, scraper_exe):
         if src.exists():
             shutil.copy2(src, pkg_dir / fname)
 
-    # 复制 config.yaml（清空敏感信息，同步 NapCat WebUI token）
-    import json
+    # 复制 config.yaml（仅保留产品实际使用的字段，清空所有敏感信息）
     import yaml
     cfg_src = BACKEND_DIR / "config.yaml"
     if cfg_src.exists():
         with open(cfg_src, "r", encoding="utf-8") as f:
             cfg = yaml.safe_load(f) or {}
-        if "scraper" not in cfg:
-            cfg["scraper"] = {}
-        cfg["scraper"]["mode"] = "realtime"
-        if "napcat" in cfg:
-            cfg["napcat"]["group_ids"] = []
-        if "llm" in cfg:
-            cfg["llm"]["api_key"] = ""
-        if "feishu_sync" in cfg:
-            cfg["feishu_sync"]["enable"] = False
-            cfg["feishu_sync"]["webhook_url"] = ""
-        if "mothership" not in cfg:
-            cfg["mothership"] = {"url": "", "node_name": ""}
-        # 自动生成随机 admin_key
-        import secrets
-        cfg["admin_key"] = secrets.token_urlsafe(16)
-        # 从 NapCat 的 webui.json 读取实际 token（确保匹配！）
-        napcat_webui_json = NAPCAT_DIR / "napcat" / "config" / "webui.json"
-        if napcat_webui_json.exists():
-            try:
-                with open(napcat_webui_json, "r", encoding="utf-8") as f:
-                    webui_cfg = json.load(f)
-                real_token = webui_cfg.get("token", "")
-                if real_token:
-                    if "napcat" not in cfg:
-                        cfg["napcat"] = {}
-                    cfg["napcat"]["webui_token"] = real_token
-                    print(f"  Synced NapCat WebUI token: {real_token}")
-            except Exception as e:
-                print(f"  [WARN] Failed to read NapCat webui.json: {e}")
+        llm = cfg.get("llm", {})
+        napcat = cfg.get("napcat", {})
+        mothership = cfg.get("mothership", {})
+        cfg = {
+            "profile": {"nickname": ""},
+            "llm": {
+                "api_key": "",
+                "base_url": llm.get("base_url", "https://api.deepseek.com"),
+                "model": llm.get("model", "deepseek-chat"),
+            },
+            "napcat": {
+                "group_ids": [],
+                "include_private": False,
+                "login_platform": napcat.get("login_platform", "iPad"),
+                "webui_token": "",
+                "webui_url": "http://127.0.0.1:6099",
+                "ws_url": "ws://127.0.0.1:3001",
+            },
+            "mothership": {
+                "enabled": False,
+                "url": mothership.get("url", "http://127.0.0.1:8010"),
+                "node_name": "",
+                "node_token": "",
+                "admin_token": "",
+                "share_evidence": False,
+                "space_id": "",
+                "space_name": "",
+                "owner_label": "",
+                "membership_status": "",
+                "categories": ["A"],
+                "source_refs": [],
+                "expires_at": "",
+            },
+            "scraper": {"mode": "realtime", "poll_interval": 2},
+        }
         with open(pkg_dir / "config.yaml", "w", encoding="utf-8") as f:
             yaml.dump(cfg, f, allow_unicode=True, default_flow_style=False)
-    print("  Copied config.yaml (sensitive data cleared, NapCat token synced)")
+    print("  Copied config.yaml (all credentials cleared)")
     print("  (DB will be auto-created in %APPDATA%/AIConsole on first run)")
 
     # 复制前端 dist
@@ -332,7 +337,7 @@ def create_exe_package(launcher_exe, api_exe, scraper_exe):
 
     # 创建 README
     readme = pkg_dir / "使用说明.txt"
-    readme.write_text("""AI 社群情报控制台 — 桌面客户端
+    readme.write_text("""AI 学生消息助手 — 桌面客户端
 
 使用方法：
 1. 双击 AI_Console_Launcher.exe 启动

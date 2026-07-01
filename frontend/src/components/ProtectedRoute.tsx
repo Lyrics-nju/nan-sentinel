@@ -42,7 +42,7 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
             if (!cancelled && Date.now() - startTime < maxDuration) {
               setTimeout(checkLogin, 1500);
             } else if (!cancelled) {
-              setLoggedIn(true);
+              setLoggedIn(false);
               setChecking(false);
             }
             return;

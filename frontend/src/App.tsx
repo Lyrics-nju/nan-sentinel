@@ -9,6 +9,7 @@ import MessagesPage from './components/MessagesPage';
 import BookmarksPage from './components/BookmarksPage';
 import ReportsPage from './components/ReportsPage';
 import SettingsPage from './components/SettingsPage';
+import MothershipPage from './components/MothershipPage';
 
 function App() {
   // 初始化主题
@@ -16,7 +17,7 @@ function App() {
     try {
       const theme = localStorage.getItem('theme');
       if (theme) document.documentElement.setAttribute('data-theme', theme);
-    } catch {}
+    } catch { /* localStorage may be unavailable in restricted webviews. */ }
   }, []);
 
   return (
@@ -29,6 +30,7 @@ function App() {
           <Route path="/messages" element={<MessagesPage />} />
           <Route path="/bookmarks" element={<BookmarksPage />} />
           <Route path="/reports" element={<ReportsPage />} />
+          <Route path="/mothership" element={<MothershipPage />} />
           <Route path="/settings" element={<SettingsPage />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />

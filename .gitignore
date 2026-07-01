@@ -75,15 +75,11 @@ get_guilds_ws.py
 # ── Runtime data ────────────────────────────────────────
 data/
 
-# ── Vercel ──────────────────────────────────────────────
-.vercel/
-
 # ── But keep these ──────────────────────────────────────
 !frontend/dist/
 !backend/requirements.txt
 !backend/scraper.py
 !backend/api.py
-!build_dist.py
 !build_exe.py
 !fetch_napcat.py
 !launcher.py

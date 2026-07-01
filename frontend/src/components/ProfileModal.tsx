@@ -10,11 +10,11 @@ export default function ProfileModal({ onClose, nickname }: { onClose: () => voi
   }, []);
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="glass rounded-2xl w-full max-w-sm animate-scale-in" onClick={e => e.stopPropagation()}>
+    <div className="modal-overlay" onClick={onClose} role="presentation">
+      <div className="glass rounded-2xl w-full max-w-sm animate-scale-in" onClick={e => e.stopPropagation()} role="dialog" aria-modal="true" aria-label="个人信息">
         {/* 头部 */}
         <div className="relative px-6 pt-6 pb-4">
-          <button onClick={onClose} className="absolute top-4 right-4 p-1.5 rounded-lg hover:bg-white/[0.06] transition-colors">
+          <button onClick={onClose} aria-label="关闭个人信息" className="absolute top-4 right-4 p-1.5 rounded-lg hover:bg-white/[0.06] transition-colors">
             <X size={18} style={{ color: 'var(--text-dim)' }} />
           </button>
 

@@ -1,8 +1,18 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Search, X, Shield, BookOpen, ShoppingBag, ArrowRight } from 'lucide-react';
+import { Search, X, Shield, BookOpen, ShoppingBag, ArrowRight, type LucideIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-const CAT: Record<string, { label: string; color: string; icon: any }> = {
+interface SearchMessage {
+  id?: number;
+  msg_id?: string;
+  category: 'A' | 'B' | 'C';
+  summary: string;
+  group_name?: string;
+  sender_name?: string;
+  created_at?: string;
+}
+
+const CAT: Record<string, { label: string; color: string; icon: LucideIcon }> = {
   A: { label: '重要信息', color: '#BB00FF', icon: Shield },
   B: { label: '校园轶事', color: '#ADFF00', icon: BookOpen },
   C: { label: '二手资讯', color: '#FF5C00', icon: ShoppingBag },
@@ -10,7 +20,7 @@ const CAT: Record<string, { label: string; color: string; icon: any }> = {
 
 export default function SearchModal({ onClose }: { onClose: () => void }) {
   const [query, setQuery] = useState('');
-  const [results, setResults] = useState<any[]>([]);
+  const [results, setResults] = useState<SearchMessage[]>([]);
   const [loading, setLoading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
@@ -33,7 +43,7 @@ export default function SearchModal({ onClose }: { onClose: () => void }) {
     try {
       const res = await fetch(`/api/messages?search=${encodeURIComponent(q)}&limit=20`);
       setResults(await res.json());
-    } catch {}
+    } catch { /* Keep the previous results during a transient local API failure. */ }
     setLoading(false);
   }, []);
 
@@ -48,8 +58,8 @@ export default function SearchModal({ onClose }: { onClose: () => void }) {
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="w-full max-w-2xl animate-scale-in" onClick={e => e.stopPropagation()}>
+    <div className="modal-overlay" onClick={onClose} role="presentation">
+      <div className="w-full max-w-2xl animate-scale-in" onClick={e => e.stopPropagation()} role="dialog" aria-modal="true" aria-label="搜索消息">
         {/* 搜索框 */}
         <div className="glass rounded-2xl overflow-hidden">
           <div className="flex items-center gap-3 px-5 py-4" style={{ borderBottom: '1px solid var(--border)' }}>
@@ -59,7 +69,7 @@ export default function SearchModal({ onClose }: { onClose: () => void }) {
               className="flex-1 bg-transparent outline-none text-base" style={{ color: 'var(--text-primary)' }} />
             <kbd className="text-xs px-2 py-0.5 rounded font-mono" style={{ background: 'rgba(255,255,255,0.06)', color: 'var(--text-dim)' }}>ESC</kbd>
             {query && (
-              <button onClick={() => setQuery('')} className="p-1 rounded hover:bg-white/[0.06]">
+              <button onClick={() => setQuery('')} aria-label="清空搜索" className="p-1 rounded hover:bg-white/[0.06]">
                 <X size={16} style={{ color: 'var(--text-dim)' }} />
               </button>
             )}
@@ -82,12 +92,12 @@ export default function SearchModal({ onClose }: { onClose: () => void }) {
               </div>
             ) : (
               <div className="divide-y" style={{ borderColor: 'var(--border)' }}>
-                {results.map((msg: any, i: number) => {
+                {results.map((msg, i) => {
                   const c = CAT[msg.category] || CAT.A;
                   const Icon = c.icon;
                   return (
-                    <div key={msg.id || i} onClick={goToMessage}
-                      className="px-5 py-3 flex items-start gap-3 hover:bg-white/[0.03] cursor-pointer transition-colors">
+                    <button key={msg.id || i} onClick={goToMessage}
+                      className="w-full text-left px-5 py-3 flex items-start gap-3 hover:bg-white/[0.03] cursor-pointer transition-colors">
                       <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 mt-0.5"
                            style={{ background: `${c.color}12` }}>
                         <Icon size={14} style={{ color: c.color }} />
@@ -101,7 +111,7 @@ export default function SearchModal({ onClose }: { onClose: () => void }) {
                         </div>
                       </div>
                       <ArrowRight size={14} style={{ color: 'var(--text-dim)' }} className="mt-1.5 shrink-0" />
-                    </div>
+                    </button>
                   );
                 })}
               </div>
